@@ -29,7 +29,8 @@ This project consists of:
 
 1. **Start the backend server**:
    ```bash
-   node server.js
+   npm run dev
+   # or `npm start` for production mode
    ```
    The server will start on port `3000`.
 
