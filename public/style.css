@@ -1,0 +1,276 @@
+:root {
+  --bg-color: #0f1115;
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --accent: #007aff;
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.6);
+  --btn-active: rgba(255, 255, 255, 0.15);
+  --danger: #ff3b30;
+  --success: #34c759;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  overflow: hidden;
+  user-select: none;
+}
+
+.screen {
+  display: none;
+  width: 100%;
+  max-width: 400px;
+  height: 100vh;
+  padding: 20px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.screen.active {
+  display: flex;
+}
+
+/* Pairing Screen */
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  padding: 30px 20px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.glass-panel h1 {
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+
+.glass-panel p {
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+
+input {
+  width: 100%;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+  background: rgba(0, 0, 0, 0.2);
+  color: white;
+  font-size: 16px;
+  margin-bottom: 16px;
+  outline: none;
+  text-align: center;
+  transition: border-color 0.3s;
+}
+
+input:focus {
+  border-color: var(--accent);
+}
+
+button {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  color: white;
+  border-radius: 12px;
+  padding: 16px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+button:active {
+  background: var(--btn-active);
+  transform: scale(0.97);
+}
+
+#connect-btn, #pair-btn {
+  background: var(--accent);
+  border: none;
+}
+#connect-btn:active, #pair-btn:active {
+  background: #005fcc;
+}
+
+/* Remote Screen */
+.remote-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+  margin-top: 20px;
+}
+
+.tv-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  background: var(--glass-bg);
+  padding: 8px 16px;
+  border-radius: 20px;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--success);
+}
+
+.btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.btn.round {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  padding: 0;
+}
+
+.btn svg {
+  width: 24px;
+  height: 24px;
+}
+
+.power-btn {
+  color: var(--danger);
+  border-color: rgba(255, 59, 48, 0.3);
+}
+
+.power-btn:active {
+  background: rgba(255, 59, 48, 0.2);
+}
+
+/* D-PAD */
+.dpad-container {
+  position: relative;
+  width: 280px;
+  height: 280px;
+  background: var(--glass-bg);
+  border-radius: 50%;
+  border: 1px solid var(--glass-border);
+  box-shadow: 
+    inset 0 4px 20px rgba(255,255,255,0.05),
+    0 10px 30px rgba(0,0,0,0.5);
+  margin-bottom: 40px;
+}
+
+.btn.dpad {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  background: transparent;
+  border: none;
+  border-radius: 20px;
+  color: var(--text-secondary);
+}
+
+.btn.dpad:active {
+  color: white;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.dpad.up { top: 10px; left: 50%; transform: translateX(-50%); }
+.dpad.down { bottom: 10px; left: 50%; transform: translateX(-50%); }
+.dpad.left { left: 10px; top: 50%; transform: translateY(-50%); }
+.dpad.right { right: 10px; top: 50%; transform: translateY(-50%); }
+
+.btn.center.ok {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  font-size: 18px;
+  font-weight: 600;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  border: 1px solid rgba(255,255,255,0.15);
+}
+
+.btn.center.ok:active {
+  background: rgba(255,255,255,0.2);
+  transform: translate(-50%, -50%) scale(0.95);
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  gap: 20px;
+  width: 100%;
+  margin-bottom: 40px;
+}
+
+.btn.pill {
+  flex: 1;
+  border-radius: 25px;
+  padding: 16px;
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  font-size: 14px;
+}
+
+/* Volume Control */
+.volume-container {
+  display: flex;
+  align-items: center;
+  background: var(--glass-bg);
+  border-radius: 30px;
+  padding: 5px;
+  border: 1px solid var(--glass-border);
+  width: 160px;
+  justify-content: space-between;
+}
+
+.btn.vol {
+  width: 45px;
+  height: 45px;
+  padding: 0;
+  border-radius: 50%;
+  font-size: 24px;
+  border: none;
+  background: rgba(255,255,255,0.05);
+}
+
+.btn.vol:active {
+  background: rgba(255,255,255,0.15);
+}
+
+.vol-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
