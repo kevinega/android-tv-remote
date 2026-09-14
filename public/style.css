@@ -112,6 +112,39 @@ button:active {
   background: #005fcc;
 }
 
+.secondary-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+}
+.secondary-btn:active {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.tv-item {
+  background: rgba(0,0,0,0.2);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.tv-item:active {
+  background: rgba(0,0,0,0.4);
+  transform: scale(0.98);
+}
+.tv-item-name {
+  font-weight: 600;
+  font-size: 15px;
+}
+.tv-item-ip {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
 /* Remote Screen */
 .remote-header {
   width: 100%;

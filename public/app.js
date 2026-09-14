@@ -6,6 +6,9 @@ const screens = {
 const elements = {
   ipInput: document.getElementById('ip-input'),
   connectBtn: document.getElementById('connect-btn'),
+  scanBtn: document.getElementById('scan-btn'),
+  scanResults: document.getElementById('scan-results'),
+  tvList: document.getElementById('tv-list'),
   pinSection: document.getElementById('pin-section'),
   pinInput: document.getElementById('pin-input'),
   pairBtn: document.getElementById('pair-btn'),
@@ -34,6 +37,41 @@ function triggerHaptic() {
     navigator.vibrate(50);
   }
 }
+
+elements.scanBtn.addEventListener('click', async () => {
+  elements.scanBtn.disabled = true;
+  elements.scanBtn.innerHTML = 'Scanning...';
+  elements.scanResults.style.display = 'none';
+  elements.tvList.innerHTML = '';
+  updateStatus('Searching for TVs on local network...');
+
+  try {
+    const res = await fetch('/api/scan');
+    const data = await res.json();
+    
+    if (data.devices && data.devices.length > 0) {
+      updateStatus(`Found ${data.devices.length} TV(s)`);
+      data.devices.forEach(tv => {
+        const li = document.createElement('li');
+        li.className = 'tv-item';
+        li.innerHTML = `<span class="tv-item-name">${tv.name}</span><span class="tv-item-ip">${tv.ip}</span>`;
+        li.addEventListener('click', () => {
+          elements.ipInput.value = tv.ip;
+          elements.connectBtn.click();
+        });
+        elements.tvList.appendChild(li);
+      });
+      elements.scanResults.style.display = 'block';
+    } else {
+      updateStatus('No TVs found. Try manual IP.');
+    }
+  } catch (err) {
+    updateStatus('Scan failed.', true);
+  } finally {
+    elements.scanBtn.disabled = false;
+    elements.scanBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px; vertical-align: middle; margin-right: 8px; margin-bottom: 2px;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg> Scan for TVs';
+  }
+});
 
 elements.connectBtn.addEventListener('click', async () => {
   const ip = elements.ipInput.value.trim();

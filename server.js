@@ -3,8 +3,10 @@ import cors from 'cors';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { Bonjour } from 'bonjour-service';
 import { createAndroidRemote, RemoteKeyCode } from '@kud/androidtv-remote';
 
+const bonjour = new Bonjour();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -29,6 +31,26 @@ function saveCerts() {
 
 // Store active remote instances
 const remotes = {};
+
+app.get('/api/scan', (req, res) => {
+  const devices = [];
+  
+  const browser = bonjour.find({ type: 'androidtvremote2' });
+  
+  browser.on('up', (service) => {
+    // Find an IPv4 address
+    const ip = service.addresses?.find(addr => addr.includes('.')) || service.host;
+    if (ip && !devices.find(d => d.ip === ip)) {
+      devices.push({ name: service.name, ip: ip });
+    }
+  });
+
+  // Scan for 3 seconds
+  setTimeout(() => {
+    browser.stop();
+    res.json({ devices });
+  }, 3000);
+});
 
 app.post('/api/connect', async (req, res) => {
   const { ip } = req.body;
