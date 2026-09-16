@@ -93,8 +93,7 @@ elements.connectBtn.addEventListener('click', async () => {
     const data = await res.json();
 
     if (data.status === 'connected') {
-      elements.pairingScreen.classList.remove('active');
-      elements.remoteScreen.classList.add('active');
+      showScreen('remote');
       updateStatus('');
       startStatusStream(ip);
     } else if (data.status === 'needs_pin') {
