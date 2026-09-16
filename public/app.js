@@ -54,7 +54,8 @@ elements.scanBtn.addEventListener('click', async () => {
       data.devices.forEach(tv => {
         const li = document.createElement('li');
         li.className = 'tv-item';
-        li.innerHTML = `<span class="tv-item-name">${tv.name}</span><span class="tv-item-ip">${tv.ip}</span>`;
+        const badge = tv.isPaired ? '<span class="badge-paired">✅ Paired</span>' : '';
+        li.innerHTML = `<span class="tv-item-name">${tv.name}${badge}</span><span class="tv-item-ip">${tv.ip}</span>`;
         li.addEventListener('click', () => {
           elements.ipInput.value = tv.ip;
           elements.connectBtn.click();
@@ -92,7 +93,10 @@ elements.connectBtn.addEventListener('click', async () => {
     const data = await res.json();
 
     if (data.status === 'connected') {
-      showScreen('remote');
+      elements.pairingScreen.classList.remove('active');
+      elements.remoteScreen.classList.add('active');
+      updateStatus('');
+      startStatusStream(ip);
     } else if (data.status === 'needs_pin') {
       updateStatus('Please enter the PIN shown on your TV');
       elements.pinSection.style.display = 'block';
@@ -125,6 +129,7 @@ elements.pairBtn.addEventListener('click', async () => {
     if (data.success) {
       setTimeout(() => {
         showScreen('remote');
+        startStatusStream(currentIp);
       }, 1000);
     } else {
       updateStatus(data.error || 'Pairing failed', true);
@@ -136,19 +141,74 @@ elements.pairBtn.addEventListener('click', async () => {
   }
 });
 
-elements.remoteButtons.forEach(btn => {
+document.querySelectorAll('.btn[data-key]').forEach(btn => {
   btn.addEventListener('click', async () => {
     triggerHaptic();
-    const key = btn.dataset.key;
+    const key = btn.getAttribute('data-key');
+    const ip = elements.ipInput.value.trim();
+    if (!ip) return;
     
+    // Add visual feedback class temporarily
+    btn.style.transform = 'scale(0.9)';
+    setTimeout(() => btn.style.transform = '', 100);
+
     try {
-      fetch('/api/command', {
+      await fetch('/api/command', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ip: currentIp, key })
+        body: JSON.stringify({ ip, key })
       });
     } catch (err) {
-      console.error('Failed to send command', err);
+      console.error('Failed to send key:', err);
     }
   });
+});
+
+let statusEventSource = null;
+function startStatusStream(ip) {
+  if (statusEventSource) statusEventSource.close();
+  statusEventSource = new EventSource(`/api/status?ip=${ip}`);
+  statusEventSource.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    const powerBtn = document.querySelector('.power-btn');
+    if (data.powered === true) {
+      powerBtn.classList.add('power-on');
+    } else if (data.powered === false) {
+      powerBtn.classList.remove('power-on');
+    }
+  };
+}
+
+const toggleKbBtn = document.getElementById('toggle-keyboard-btn');
+const kbWrapper = document.getElementById('keyboard-input-wrapper');
+const kbInput = document.getElementById('keyboard-input');
+const sendTextBtn = document.getElementById('send-text-btn');
+
+toggleKbBtn.addEventListener('click', () => {
+  if (kbWrapper.style.display === 'none') {
+    kbWrapper.style.display = 'flex';
+    kbInput.focus();
+  } else {
+    kbWrapper.style.display = 'none';
+  }
+});
+
+const sendText = async () => {
+  const text = kbInput.value;
+  if (!text) return;
+  triggerHaptic();
+  
+  try {
+    await fetch('/api/text', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ip: elements.ipInput.value.trim(), text })
+    });
+    kbInput.value = '';
+  } catch(e) {}
+};
+
+sendTextBtn.addEventListener('click', sendText);
+kbInput.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') sendText();
 });

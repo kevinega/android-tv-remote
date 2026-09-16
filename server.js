@@ -41,7 +41,7 @@ app.get('/api/scan', (req, res) => {
     // Find an IPv4 address
     const ip = service.addresses?.find(addr => addr.includes('.')) || service.host;
     if (ip && !devices.find(d => d.ip === ip)) {
-      devices.push({ name: service.name, ip: ip });
+      devices.push({ name: service.name, ip: ip, isPaired: !!certs[ip] });
     }
   });
 
@@ -136,6 +136,52 @@ app.post('/api/send-pin', (req, res) => {
   }
 });
 
+app.get('/api/status', (req, res) => {
+  const { ip } = req.query;
+  if (!ip) return res.status(400).json({ error: 'IP address required' });
+
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+
+  const remote = remotes[ip];
+  const onPower = (isPowered) => {
+    res.write(`data: ${JSON.stringify({ powered: isPowered })}\n\n`);
+  };
+
+  if (remote) {
+    // Send initial status if supported, otherwise just wait for events
+    // (Note: The library might not expose remote.powered directly, we rely on the event)
+    res.write(`data: ${JSON.stringify({ connected: true })}\n\n`);
+    remote.on('powered', onPower);
+  } else {
+    res.write(`data: ${JSON.stringify({ error: 'Not connected' })}\n\n`);
+  }
+
+  req.on('close', () => {
+    if (remote) {
+      try {
+        remote.off('powered', onPower);
+      } catch (e) {}
+    }
+  });
+});
+
+app.post('/api/text', (req, res) => {
+  const { ip, text } = req.body;
+  if (!ip || text === undefined) return res.status(400).json({ error: 'IP and text required' });
+
+  const remote = remotes[ip];
+  if (!remote) return res.status(404).json({ error: 'No connection initialized for this IP' });
+
+  try {
+    remote.sendText(text);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.post('/api/command', (req, res) => {
   const { ip, key } = req.body;
   if (!ip || !key) return res.status(400).json({ error: 'IP and key required' });
@@ -156,7 +202,4 @@ app.post('/api/command', (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`TV Remote server listening on http://0.0.0.0:${PORT}`);
-});
+export default app;

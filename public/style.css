@@ -112,6 +112,30 @@ button:active {
   background: #005fcc;
 }
 
+.power-btn {
+  background: rgba(255, 60, 60, 0.2);
+  border: 1px solid rgba(255, 60, 60, 0.3);
+  color: #ff4444;
+  transition: all 0.3s ease;
+}
+
+.power-on {
+  background: rgba(74, 222, 128, 0.15) !important;
+  border-color: rgba(74, 222, 128, 0.4) !important;
+  color: #4ade80 !important;
+  box-shadow: 0 0 15px rgba(74, 222, 128, 0.3);
+}
+
+.badge-paired {
+  font-size: 10px;
+  background: rgba(74, 222, 128, 0.2);
+  color: #4ade80;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
 .secondary-btn {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--glass-border);
